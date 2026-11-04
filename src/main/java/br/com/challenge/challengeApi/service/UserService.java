@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -45,9 +46,21 @@ public class UserService {
         }
     }
 
+    public UserExhibitionDto searchByEmail(String email) {
+
+        UserDetails userDetails = userRepository.findByEmail(email);
+        if (userDetails == null) {
+            throw new UserNotFoundException("User does not exist.");
+        }
+        User user = (User) userDetails;
+
+        return new UserExhibitionDto(user);
+    }
+
     public Page<UserExhibitionDto> listAll(Pageable pageable){
         return userRepository.findByRole(UserRole.SIGNER, pageable).map(UserExhibitionDto::new);
     }
+
 
     public Page<UserExhibitionDto> listAllSigners(Pageable pageable){
         return userRepository.findByRole(UserRole.SIGNER,pageable).map(UserExhibitionDto::new);

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -35,6 +36,21 @@ public class UserController {
         try {
             return ResponseEntity.ok(userService.searchById(id));
         }catch (UserNotFoundException e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserExhibitionDto> searchMe(Authentication authentication
+    ) {
+        try {
+            String email = authentication.getName();
+
+            return ResponseEntity.ok(
+                    userService.searchByEmail(email)
+            );
+
+        } catch (UserNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
