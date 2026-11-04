@@ -11,8 +11,6 @@ public record UserPatchDto(
         @NotBlank(message = "Email must have a value")
         @Email(message ="Invalid email")
         String email,
-        @NotBlank(message = "")
-        @Size(min = 5, max = 16, message = "password must be between 5 to 16 digits")
         String password,
         @NotBlank(message = "Must have phoneNumber")
         String phoneNumber

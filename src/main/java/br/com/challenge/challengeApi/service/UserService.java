@@ -7,6 +7,7 @@ import br.com.challenge.challengeApi.exception.UserNotFoundException;
 import br.com.challenge.challengeApi.model.User;
 import br.com.challenge.challengeApi.model.UserRole;
 import br.com.challenge.challengeApi.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -76,25 +77,35 @@ public class UserService {
         }
     }
 
-    public UserExhibitionDto patch(UserPatchDto userDto, Long id){
-        Optional<User> userOptional = userRepository.findById(id);
+    @Transactional
+    public UserExhibitionDto patch(UserPatchDto userDto, Long id) {
 
+        User user = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new UserNotFoundException("User does not exist")
+                );
 
-        if(userOptional.isPresent()){
-            User user = userOptional.get();
-
-
-            BeanUtils.copyProperties(userDto, user, "password");
-
-            if(userDto.password() != null){
-                user.setPassword(new BCryptPasswordEncoder().encode(userDto.password()));
-            }
-
-            return new UserExhibitionDto(userRepository.save(user));
+        if (userDto.fullname() != null) {
+            user.setFullName(userDto.fullname());
         }
-        else {
-            throw new UserNotFoundException("User does not exist");
+
+        if (userDto.email() != null) {
+            user.setEmail(userDto.email());
         }
+
+        if (userDto.phoneNumber() != null) {
+            user.setPhoneNumber(userDto.phoneNumber());
+        }
+
+        if (userDto.password() != null &&
+                !userDto.password().isBlank()) {
+
+            user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+        }
+
+        User updatedUser = userRepository.save(user);
+
+        return new UserExhibitionDto(updatedUser);
     }
 
 
