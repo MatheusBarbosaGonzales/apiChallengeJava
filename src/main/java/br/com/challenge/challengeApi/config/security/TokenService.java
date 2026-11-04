@@ -23,7 +23,7 @@ public class TokenService {
 
         try{
             Algorithm algorithm = Algorithm.HMAC256(secretWord);
-            return JWT.create().withIssuer("challengeApi").withSubject(user.getUsername()).withExpiresAt(generateTokenExpirationDate()).sign(algorithm);
+            return JWT.create().withIssuer("challengeApi").withSubject(user.getUsername()).withClaim("role", user.getRole().name()).withExpiresAt(generateTokenExpirationDate()).sign(algorithm);
 
         }catch(JWTCreationException e){
             throw new RuntimeException("Coudn't generate token");
