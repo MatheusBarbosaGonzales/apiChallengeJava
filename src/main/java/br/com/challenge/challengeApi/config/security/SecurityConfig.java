@@ -28,7 +28,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests( authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/users/me").hasAnyRole("ADMIN", "SIGNER")
                         .requestMatchers( "/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/documents/upload").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/documents/*/sign").hasRole("SIGNER")
+                        .requestMatchers(HttpMethod.GET, "/documents").hasAnyRole("ADMIN", "SIGNER")
+                        .requestMatchers("/documents/**").hasAnyRole("ADMIN","SIGNER")
                         .anyRequest().authenticated()
                 ).addFilterBefore(
                         verifyToken,
