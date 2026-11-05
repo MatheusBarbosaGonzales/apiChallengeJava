@@ -54,22 +54,30 @@ public class DocumentController {
     }
 
 
-    @PatchMapping("/{id}/sign")
+    @PatchMapping(
+            value = "/{id}/sign",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public ResponseEntity<DocumentExhibitionDto> signDocument(
             @PathVariable Long id,
+            @RequestPart("signature") MultipartFile signature,
             Authentication authentication
-    ) {
+    ) throws IOException {
+
         String username = authentication.getName();
 
         User user = (User) userRepository.findByEmail(username);
 
-        Document document = documentService.signDocument(id, user);
+        Document document = documentService.signDocument(
+                id,
+                user,
+                signature
+        );
 
         return ResponseEntity.ok(
                 new DocumentExhibitionDto(document)
         );
     }
-
 
     @PostMapping(
             value = "/upload",
